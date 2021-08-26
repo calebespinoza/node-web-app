@@ -1,0 +1,30 @@
+{
+  "name": "docker_web_app",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "Caleb Espinoza  <caleb.espinoza@mail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest  --coverage --testPathPattern=. --runInBand --detectOpenHandles --forceExit"
+  },
+  "devDependencies": {
+    "express": "^4.16.1",
+    "jest": "27.0.6",
+    "supertest": "6.1.6"
+  },
+  "jest": {
+      "projects": [
+          "."
+      ],
+      "verbose": true,
+      "collectCoverage": true,
+      "coverageReporters": [
+          "text",
+          "cobertura"
+      ]
+  },
+  "dependencies": {
+    "supertest": "6.1.6"
+  }
+}
