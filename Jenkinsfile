@@ -3,6 +3,11 @@ pipeline {
     tools {
         nodejs 'node16.8.0'
     }
+    
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials("dockerhub")
+    }
+
 
     stages {
 
@@ -31,9 +36,7 @@ pipeline {
 
         stage('Publish Image') {
             steps {
-                sh """
-                echo "" | docker login -u calebespinoza --password-stdin
-                """
+                sh "echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
             }
             post {
                 always {
