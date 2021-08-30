@@ -22,21 +22,21 @@ pipeline {
             }
         }
 
-        stage('Unit tests') {
+        stage('Unit Tests & Coverage') {
             steps {
                 sh "npm test"
             }
         }
 
         stage('Build Image') {
-            //when { 
-            //    branch 'main' 
-            //}
+            when { 
+                branch 'main' 
+            }
             environment{ 
                 TAG = "$IMAGE_TAG_STG"
             }
             steps {
-                sh "docker-compose build $COMPOSE_SERVICE_NAME"
+                sh "docker-compose build $IMAGE_NAME"
             }
             post { 
                 failure{
@@ -48,7 +48,7 @@ pipeline {
         }
 
         stage('Publish Image') {
-            //when { branch 'main' }
+            when { branch 'main' }
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh "echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
