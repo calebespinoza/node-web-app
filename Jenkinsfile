@@ -22,6 +22,7 @@ pipeline {
                 sh "npm install"
             }
         }
+
         stage('Unit tests') {
             steps {
                 sh "npm test"
@@ -57,7 +58,7 @@ pipeline {
             post {
                 always {
                     script {
-                        sh "docker-compose down --rmi"
+                        sh "docker rmi -f $FULL_IMAGE_NAME:$TAG"
                         sh "docker logout"
                     }
                 }
