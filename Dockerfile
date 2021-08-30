@@ -4,5 +4,5 @@ EXPOSE 8080
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm test
+#RUN npm test
 CMD [ "node", "start.js" ]
