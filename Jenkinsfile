@@ -12,7 +12,7 @@ pipeline {
         IMAGE_TAG_STG = "$BUILD_NUMBER-stg"
         IMAGE_TAG_PROD = "$BUILD_NUMBER-prod"
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
-        COMPOSE_SERVICE_NAME = "nodeapp"
+        COMPOSE_SERVICE_NAME = "node-app"
     }
 
     stages {
@@ -65,14 +65,5 @@ pipeline {
             }
         }
     // End Continuous Integration Pipeline
-    // Continuous Delivery Pipeline
-        stage ('Deploy to Staging') {
-            //when { branch 'main' }
-            environment{ TAG = "$IMAGE_TAG_STG" }
-            steps {
-                sh "docker-compose up -d --force-recreate"
-            }
-        }
-    // End Continuous Delivery Pipeline
     }
 }
