@@ -1,0 +1,15 @@
+version: "3"
+
+services: 
+  nodeapp:
+    image: $FULL_IMAGE_NAME:$TAG
+    build: 
+      context: .
+    container_name: $IMAGE_NAME-$TAG
+    ports: 
+      - 9090:8080
+    networks: 
+      - appnet
+
+networks:
+  appnet:
