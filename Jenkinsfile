@@ -12,7 +12,6 @@ pipeline {
         IMAGE_TAG_STG = "$BUILD_NUMBER-stg"
         IMAGE_TAG_PROD = "$BUILD_NUMBER-prod"
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
-        COMPOSE_SERVICE_NAME = "node-app"
     }
 
     stages {
