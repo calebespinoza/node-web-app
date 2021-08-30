@@ -52,7 +52,7 @@ pipeline {
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh "echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                sh "docker-compose push $COMPOSE_SERVICE_NAME"
+                sh "docker-compose push $IMAGE_NAME"
             }
             post {
                 always {
