@@ -33,7 +33,7 @@ pipeline {
             //    branch 'main' 
             //}
             environment{ 
-                $TAG = $IMAGE_TAG_STG 
+                $TAG = "$IMAGE_TAG_STG"
             }
             steps {
                 sh "docker-compose build $COMPOSE_SERVICE_NAME"
@@ -49,7 +49,7 @@ pipeline {
 
         stage('Publish Image') {
             //when { branch 'main' }
-            environment{ $TAG = $IMAGE_TAG_STG }
+            environment{ $TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh "echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
                 sh "docker-compose push $COMPOSE_SERVICE_NAME"
@@ -67,7 +67,7 @@ pipeline {
     // Continuous Delivery Pipeline
         stage ('Deploy to Staging') {
             //when { branch 'main' }
-            environment{ $TAG = $IMAGE_TAG_STG }
+            environment{ $TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh "docker-compose up -d --no-build --force-recreate"
             }
