@@ -70,7 +70,7 @@ pipeline {
             //when { branch 'main' }
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
-                sh "docker-compose up -d --no-build --force-recreate"
+                sh "docker-compose up -d --force-recreate"
             }
         }
     // End Continuous Delivery Pipeline
