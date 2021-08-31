@@ -30,12 +30,13 @@ pipeline {
         }
 
         stage ('Static Code Analysis') {
+            environment { LCOV_COVERAGE_REPORT_PATH = "coverage/lcov.info"}
             steps {
                 script {
                     def scannerHome = tool 'sonarscanner4.6.2'
                     def scannerParameters = "-Dsonar.projectName=$PROJECT_NAME " + 
-                        "-Dsonar.projectKey=$PROJECT_NAME -Dsonar.sources=. " //+ 
-                        //"-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
+                        "-Dsonar.projectKey=$PROJECT_NAME -Dsonar.sources=. " + 
+                        "-Dsonar.javascript.lcov.reportPaths=$LCOV_COVERAGE_REPORT_PATH"
                     withSonarQubeEnv('sonarqube-automation') {
                         sh "${scannerHome}/bin/sonar-scanner ${scannerParameters}"
                     }
