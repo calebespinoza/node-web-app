@@ -59,7 +59,7 @@ pipeline {
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
                 //sh "docker-compose build $IMAGE_NAME"
-                sh "docker build -t $PRIVATE_IMAGE_NAME:$TAG"
+                sh "docker build -t $PRIVATE_IMAGE_NAME:$TAG ."
             }
             post { 
                 failure{
