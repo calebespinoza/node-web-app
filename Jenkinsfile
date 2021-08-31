@@ -6,7 +6,7 @@ pipeline {
     }
     
     environment {
-        NEXUS_SERVER_URL = "10.0.2.15:8083"
+        NEXUS_SERVER_URL = "10.0.2.15:8082"
         DOCKER_HUB_CREDENTIALS = credentials("dockerhub")
         DOCKER_HUB_REPO = "calebespinoza"
         IMAGE_NAME = "nodeapp"
