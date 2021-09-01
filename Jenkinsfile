@@ -137,6 +137,41 @@ pipeline {
                 sh "curl -I $API_BASE_URL:$PORT_2 --silent | grep 200"
             }
         }
+
+        stage ('Tag Production Image') {
+            environment { TAG = "$IMAGE_TAG_PROD" }
+            steps {
+                sh "docker tag $FULL_IMAGE_NAME:$IMAGE_TAG_STG $FULL_IMAGE_NAME:$IMAGE_TAG_PROD"
+            }
+        }
+
+        stage('Deliver Image for Production') {
+            //when { branch 'main' }
+            environment{ 
+                TAG = "$IMAGE_TAG_STG"
+                NEXUS_CREDENTIALS = credentials("nexus")
+            }
+            steps {
+                sh """
+                echo 'Log into Docker Hub'
+                echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+                echo 'Push image to Docker Hub'
+                docker push $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                """
+            }
+            post {
+                always {
+                    script {
+                        sh """
+                        echo "Removing Image built for Docker Hub"
+                        docker rmi -f $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                        echo 'Logout Docker Hub'
+                        docker logout
+                        """
+                    }
+                }
+            }
+        }
     // End Continuous Delivery Pipeline
     }
 }
