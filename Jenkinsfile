@@ -53,9 +53,9 @@ pipeline {
         }
 
         stage('Build Image') {
-            when { 
-                branch 'main' 
-            }
+            //when { 
+            //    branch 'main' 
+            //}
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh """
@@ -75,7 +75,7 @@ pipeline {
         }
 
         stage('Publish Image') {
-            when { branch 'main' }
+            //when { branch 'main' }
             environment{ 
                 TAG = "$IMAGE_TAG_STG"
                 NEXUS_CREDENTIALS = credentials("nexus")
