@@ -37,8 +37,8 @@ pipeline {
                 script {
                     def scannerHome = tool 'sonarscanner4.6.2'
                     def scannerParameters = "-Dsonar.projectName=$PROJECT_NAME " + 
-                        "-Dsonar.projectKey=$PROJECT_NAME -Dsonar.sources=. " //+ 
-                        //"-Dsonar.javascript.lcov.reportPaths=$LCOV_REPORT_PATH"
+                        "-Dsonar.projectKey=$PROJECT_NAME -Dsonar.sources=. " + 
+                        "-Dsonar.javascript.lcov.reportPaths=$LCOV_REPORT_PATH"
                     withSonarQubeEnv('sonarqube-automation') {
                         sh "${scannerHome}/bin/sonar-scanner ${scannerParameters}"
                     }
@@ -53,13 +53,17 @@ pipeline {
         }
 
         stage('Build Image') {
-            //when { 
-            //    branch 'main' 
-            //}
+            when { 
+                branch 'main' 
+            }
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
-                //sh "docker-compose build $IMAGE_NAME"
-                sh "docker build -t $PRIVATE_IMAGE_NAME:$TAG ."
+                sh """
+                echo 'Building Image for Public Registry (Docker Hub)'
+                docker-compose build $IMAGE_NAME
+                echo 'Building Image for Private Registry (Nexus)'
+                docker build -t $PRIVATE_IMAGE_NAME:$TAG .
+                """
             }
             post { 
                 failure{
@@ -71,24 +75,36 @@ pipeline {
         }
 
         stage('Publish Image') {
-            //when { branch 'main' }
+            when { branch 'main' }
             environment{ 
                 TAG = "$IMAGE_TAG_STG"
                 NEXUS_CREDENTIALS = credentials("nexus")
             }
             steps {
-                //sh "echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                //sh "docker-compose push $IMAGE_NAME"
-                sh "echo '$NEXUS_CREDENTIALS_PSW' | docker login -u $NEXUS_CREDENTIALS_USR --password-stdin $NEXUS_SERVER_URL"
-                sh "docker push $PRIVATE_IMAGE_NAME:$TAG"
+                sh """
+                echo 'Log into Docker Hub'
+                echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+                echo 'Push image to Docker Hub'
+                docker-compose push $IMAGE_NAME
+                echp 'Log into Nexus'
+                echo '$NEXUS_CREDENTIALS_PSW' | docker login -u $NEXUS_CREDENTIALS_USR --password-stdin $NEXUS_SERVER_URL
+                echo "Push image to Nexus"
+                docker push $PRIVATE_IMAGE_NAME:$TAG
+                """
             }
             post {
                 always {
                     script {
-                        //sh "docker rmi -f $FULL_IMAGE_NAME:$TAG"
-                        //sh "docker logout"
-                        sh "docker rmi -f $PRIVATE_IMAGE_NAME:$TAG"
-                        sh "docker logout $NEXUS_SERVER_URL"
+                        sh """
+                        echo "Removing Image built for Docker Hub"
+                        docker rmi -f $FULL_IMAGE_NAME:$TAG
+                        echo 'Logout Docker Hub'
+                        docker logout
+                        echo 'Removing Image built for Nexus'
+                        docker rmi -f $PRIVATE_IMAGE_NAME:$TAG
+                        echo 'Logout Nexus'
+                        docker logout $NEXUS_SERVER_URL
+                        """
                     }
                 }
             }
