@@ -86,7 +86,7 @@ pipeline {
                 echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
                 echo 'Push image to Docker Hub'
                 docker-compose push $IMAGE_NAME
-                echp 'Log into Nexus'
+                echo 'Log into Nexus'
                 echo '$NEXUS_CREDENTIALS_PSW' | docker login -u $NEXUS_CREDENTIALS_USR --password-stdin $NEXUS_SERVER_URL
                 echo "Push image to Nexus"
                 docker push $PRIVATE_IMAGE_NAME:$TAG
