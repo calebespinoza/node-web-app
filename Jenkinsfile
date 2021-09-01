@@ -118,7 +118,6 @@ pipeline {
                 TAG = "$IMAGE_TAG_STG" 
                 SERVICE_NAME = "$IMAGE_NAME"
                 SERVICES_QUANTITY = "2"
-                SERVICE_URL = "http://10.0.2.15"
                 PORT_1 = "9090"
                 PORT_2 = "9091"
             }
@@ -129,9 +128,11 @@ pipeline {
         }
 
         stage ('User Acceptance Tests') {
+            //when { branch 'main'}
+            environment { API_BASE_URL = "http://10.0.2.15" }
             steps {
-                sh "curl -I $SERVICE_URL:$PORT_1 --silent | grep 200"
-                sh "curl -I $SERVICE_URL:$PORT_2 --silent | grep 200"
+                sh "curl -I $API_BASE_URL:$PORT_1 --silent | grep 200"
+                sh "curl -I $API_BASE_URL:$PORT_2 --silent | grep 200"
             }
         }
     // End Continuous Delivery Pipeline
