@@ -20,6 +20,7 @@
       "verbose": true,
       "collectCoverage": true,
       "coverageReporters": [
+          "lcov",
           "html",
           "text",
           "cobertura"

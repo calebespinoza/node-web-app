@@ -12,6 +12,7 @@ pipeline {
         IMAGE_TAG_STG = "$BUILD_NUMBER-stg"
         IMAGE_TAG_PROD = "$BUILD_NUMBER-prod"
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
+        PROJECT_NAME = "node-web-app"
     }
 
     stages {
@@ -25,6 +26,21 @@ pipeline {
         stage('Unit Tests & Coverage') {
             steps {
                 sh "npm test"
+            }
+        }
+
+        stage ('Static Code Analysis') {
+            environment { LCOV_COVERAGE_REPORT_PATH = "coverage/lcov.info"}
+            steps {
+                script {
+                    def scannerHome = tool 'sonarscanner4.6.2'
+                    def scannerParameters = "-Dsonar.projectName=$PROJECT_NAME " + 
+                        "-Dsonar.projectKey=$PROJECT_NAME -Dsonar.sources=. " + 
+                        "-Dsonar.javascript.lcov.reportPaths=$LCOV_COVERAGE_REPORT_PATH"
+                    withSonarQubeEnv('sonarqube-automation') {
+                        sh "${scannerHome}/bin/sonar-scanner ${scannerParameters}"
+                    }
+                }
             }
         }
 
