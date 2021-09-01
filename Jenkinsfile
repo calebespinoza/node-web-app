@@ -130,8 +130,8 @@ pipeline {
 
         stage ('User Acceptance Tests') {
             steps {
-                sh "curl -I $SERViCE_URL:$PORT_1 --silent | grep 200"
-                sh "curl -I $SERViCE_URL:$PORT_1 --silent | grep 200"
+                sh "curl -I $SERVICE_URL:$PORT_1 --silent | grep 200"
+                sh "curl -I $SERVICE_URL:$PORT_2 --silent | grep 200"
             }
         }
     // End Continuous Delivery Pipeline
