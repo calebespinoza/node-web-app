@@ -110,5 +110,30 @@ pipeline {
             }
         }
     // End Continuous Integration Pipeline
+
+    // Continuous Delivery Pipeline
+        stage ('Deploy to Staging') {
+            //when { branch 'main' }
+            environment{ 
+                TAG = "$IMAGE_TAG_STG" 
+                SERVICE_NAME = "$IMAGE_NAME"
+                SERVICES_QUANTITY = "2"
+                SERVICE_URL = "http://10.0.2.15"
+                PORT_1 = "9090"
+                PORT_2 = "9091"
+            }
+            steps {
+                sh "docker-compose up -d --scale $SERVICE_NAME=$SERVICES_QUANTITY --force-recreate"
+                sleep 15
+            }
+        }
+
+        stage ('User Acceptance Tests') {
+            steps {
+                sh "curl -I $SERViCE_URL:$PORT_1 --silent | grep 200"
+                sh "curl -I $SERViCE_URL:$PORT_1 --silent | grep 200"
+            }
+        }
+    // End Continuous Delivery Pipeline
     }
 }
