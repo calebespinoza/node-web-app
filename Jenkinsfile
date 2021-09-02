@@ -55,9 +55,9 @@ pipeline {
         }
 
         stage('Build Image') {
-            //when { 
-            //    branch 'main' 
-            //}
+            when { 
+                branch 'main' 
+            }
             environment{ TAG = "$IMAGE_TAG_STG" }
             steps {
                 sh """
@@ -77,7 +77,7 @@ pipeline {
         }
 
         stage('Publish Image') {
-            //when { branch 'main' }
+            when { branch 'main' }
             environment{ 
                 TAG = "$IMAGE_TAG_STG"
                 NEXUS_CREDENTIALS = credentials("nexus")
@@ -119,7 +119,7 @@ pipeline {
             environment{ 
                 TAG = "$IMAGE_TAG_STG" 
                 SERVICE_NAME = "$IMAGE_NAME"
-                SERVICES_QUANTITY = "3"
+                SERVICES_QUANTITY = "2"
             }
             steps {
                 sh "docker-compose up -d --scale $SERVICE_NAME=$SERVICES_QUANTITY --force-recreate"
@@ -143,9 +143,11 @@ pipeline {
         }
 
         stage ('Tag Production Image') {
+            when { branch 'main' }
             environment { TAG = "$IMAGE_TAG_PROD" }
             steps {
                 sh "docker tag $FULL_IMAGE_NAME:$IMAGE_TAG_STG $FULL_IMAGE_NAME:$IMAGE_TAG_PROD"
+                sh "docker tag $FULL_IMAGE_NAME:$IMAGE_TAG_STG $FULL_IMAGE_NAME:latest"
             }
         }
 
@@ -160,6 +162,7 @@ pipeline {
                 echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
                 echo 'Push image to Docker Hub'
                 docker push $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                docker push $FULL_IMAGE_NAME:latest
                 """
             }
             post {
