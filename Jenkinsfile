@@ -112,5 +112,72 @@ pipeline {
             }
         }
     // End Continuous Integration Pipeline
+
+    // Continuous Delivery Pipeline
+        stage ('Deploy to Staging') {
+            when { branch 'main' }
+            environment{ 
+                TAG = "$IMAGE_TAG_STG" 
+                SERVICE_NAME = "$IMAGE_NAME"
+                SERVICES_QUANTITY = "2"
+            }
+            steps {
+                sh "docker-compose up -d --scale $SERVICE_NAME=$SERVICES_QUANTITY --force-recreate"
+                sleep 15
+            }
+        }
+
+        stage ('User Acceptance Tests') {
+            when { branch 'main'}
+            environment { 
+                API_BASE_URL = "http://10.0.2.15"
+                PORT_1 = "9090"
+                PORT_2 = "9091"
+            }
+            steps {
+                sh "curl -I $API_BASE_URL:$PORT_1 --silent | grep 200"
+                sh "curl -I $API_BASE_URL:$PORT_1/atlatam01 --silent | grep 200"
+                sh "curl -I $API_BASE_URL:$PORT_2 --silent | grep 200"
+                sh "curl -I $API_BASE_URL:$PORT_2/atlatam01 --silent | grep 200"
+            }
+        }
+
+        stage ('Tag Production Image') {
+            when { branch 'main' }
+            environment { TAG = "$IMAGE_TAG_PROD" }
+            steps {
+                sh "docker tag $FULL_IMAGE_NAME:$IMAGE_TAG_STG $FULL_IMAGE_NAME:$IMAGE_TAG_PROD"
+                sh "docker tag $FULL_IMAGE_NAME:$IMAGE_TAG_STG $FULL_IMAGE_NAME:latest"
+            }
+        }
+
+        stage('Deliver Image for Production') {
+            when { branch 'main' }
+            environment{ 
+                NEXUS_CREDENTIALS = credentials("nexus")
+            }
+            steps {
+                sh """
+                echo 'Log into Docker Hub'
+                echo '$DOCKER_HUB_CREDENTIALS_PSW' | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin
+                echo 'Push image to Docker Hub'
+                docker push $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                docker push $FULL_IMAGE_NAME:latest
+                """
+            }
+            post {
+                always {
+                    script {
+                        sh """
+                        echo "Removing Image built for Docker Hub"
+                        docker rmi -f $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                        echo 'Logout Docker Hub'
+                        docker logout
+                        """
+                    }
+                }
+            }
+        }
+    // End Continuous Delivery Pipeline
     }
 }

@@ -5,9 +5,9 @@ services:
     image: $FULL_IMAGE_NAME:$TAG
     build: 
       context: .
-    container_name: $IMAGE_NAME-$TAG
+    #container_name: $IMAGE_NAME-$TAG
     ports: 
-      - 9090:8080
+      - 9090-9091:8080
     networks: 
       - appnet
 
