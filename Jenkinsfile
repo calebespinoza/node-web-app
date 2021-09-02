@@ -15,7 +15,6 @@ pipeline {
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
         PROJECT_NAME = "node-web-app"
         PRIVATE_IMAGE_NAME = "$NEXUS_SERVER_URL/$IMAGE_NAME"
-        //PROD_PRIVATE_KEY = credentials("prod-key")
     }
 
     stages {
@@ -184,7 +183,7 @@ pipeline {
 
     // Continuos Deployment Pipeline
         stage ('Continuous Deployment') {
-            //when { branch 'main' }
+            when { branch 'main' }
             environment {
                 PROD_SERVER = "ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com"
                 FOLDER_NAME = "node-web-app"
@@ -194,7 +193,7 @@ pipeline {
             }
             stages {
                 stage ('Create .env file') {
-                    //when { branch 'main' }
+                    when { branch 'main' }
                     environment{ TAG = "latest" }
                     steps {
                         sh """
@@ -205,7 +204,7 @@ pipeline {
                 }
 
                 stage ('Copy files to Prod Server') {
-                    //when { branch 'main' }
+                    when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
                             sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $FOLDER_NAME"
@@ -216,7 +215,7 @@ pipeline {
                 }
 
                 stage ('Deploy in Production') {
-                    //when { branch 'main' }
+                    when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
                             sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x /home/ubuntu/$FOLDER_NAME/$SCRIPT"
