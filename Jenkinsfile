@@ -198,7 +198,7 @@ pipeline {
             steps {
                 sshagent(['prod-key']) {
                     sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com mkdir -p node-web-app"
-                    sh "scp .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
+                    sh "scp .env deployment.sh prod.docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
                     sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a /home/ubuntu/node-web-app"
                 }
             }
