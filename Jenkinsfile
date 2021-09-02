@@ -15,7 +15,7 @@ pipeline {
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
         PROJECT_NAME = "node-web-app"
         PRIVATE_IMAGE_NAME = "$NEXUS_SERVER_URL/$IMAGE_NAME"
-        PROD_PRIVATE_KEY = credentials("prod-key")
+        //PROD_PRIVATE_KEY = credentials("prod-key")
     }
 
     stages {
@@ -196,7 +196,11 @@ pipeline {
 
         stage ('Copy files to Prod Server') {
             steps {
-                sh "echo '$PROD_PRIVATE_KEY_PSW'"
+                sshagent(['prod-key']) {
+                    sh "ssh -i $PROD_PRIVATE_KEY_PSW -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
+                    sh "scp -i $PROD_PRIVATE_KEY_PSW .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
+                }
+                //sh "echo '$PROD_PRIVATE_KEY_PSW'"
                 //sh "scp -i $PROD_PRIVATE_KEY_PSW .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
                 //sh "ssh -i $PROD_PRIVATE_KEY_PSW -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
             }
