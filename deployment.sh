@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source $HOME/node-web-app/.env
+#source $HOME/node-web-app/.env
+cd $HOME/node-web-app
 
 echo "Retrieving the Container ID if exits"
 container1=$(docker ps --filter status=running --filter name=node-web-app* -q | head -n 1)
@@ -18,13 +19,13 @@ then
         imageID=$(docker inspect --format='{{.Id}}' $imageName)
         if [ $imageID ];
         then
-            cd $HOME/node-web-app
-            docker-compose stop nodeapp
-            docker-compose rm -f
+            #cd $HOME/node-web-app
+            docker-compose -f prod.docker-compose.yaml stop
+            docker-compose -f prod.docker-compose.yaml rm -f
             #docker rm -f $container1 $container2
             #docker rmi -f $imageID
         fi
     fi
 fi
 
-docker-compose -f $HOME/node-web-app/prod.docker-compose.yaml up -d --scale nodeapp=2 --force-recreate
+docker-compose -f prod.docker-compose.yaml up -d --scale nodeapp=2 --force-recreate
