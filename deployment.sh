@@ -22,6 +22,7 @@ then
             #cd $HOME/node-web-app
             docker-compose -f prod.docker-compose.yaml stop
             docker-compose -f prod.docker-compose.yaml rm -f
+            docker-compose -f prod.docker-compose.yaml pull
             #docker rm -f $container1 $container2
             #docker rmi -f $imageID
         fi
