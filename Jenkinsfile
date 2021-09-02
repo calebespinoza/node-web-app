@@ -183,36 +183,47 @@ pipeline {
     // End Continuous Delivery Pipeline
 
     // Continuos Deployment Pipeline
-        stage ('Create .env file') {
+        stage ('Continuous Deployment') {
             //when { branch 'main' }
-            environment{ TAG = "latest" }
-            steps {
-                sh """
-                echo 'export FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > .env
-                echo 'export TAG=$TAG' >> .env
-                echo 'export SERVICE_NAME=$IMAGE_NAME' >> .env
-                """
+            environment {
+                PROD_SERVER = "ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com"
             }
-        }
+            stages {
+                stage ('Create .env file') {
+                    //when { branch 'main' }
+                    environment{ TAG = "latest" }
+                    steps {
+                        sh """
+                        echo 'export FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > .env
+                        echo 'export TAG=$TAG' >> .env
+                        echo 'export SERVICE_NAME=$IMAGE_NAME' >> .env
+                        """
+                    }
+                }
 
-        stage ('Copy files to Prod Server') {
-            steps {
-                sshagent(['prod-key']) {
-                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com mkdir -p node-web-app"
-                    sh "scp .env deployment.sh prod.docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
-                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a /home/ubuntu/node-web-app"
+                stage ('Copy files to Prod Server') {
+                    //when { branch 'main' }
+                    steps {
+                        sshagent(['prod-key']) {
+                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com mkdir -p node-web-app"
+                            sh "scp .env deployment.sh prod.docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
+                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a /home/ubuntu/node-web-app"
+                        }
+                    }
+                }
+
+                stage ('Deploy in Production') {
+                    //when { branch 'main' }
+                    steps {
+                        sshagent(['prod-key']) {
+                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com chmod +x /home/ubuntu/node-web-app/deployment.sh"
+                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com /home/ubuntu/node-web-app/deployment.sh"
+                        }
+                    }
                 }
             }
         }
-
-        stage ('Deploy in Production') {
-            steps {
-                sshagent(['prod-key']) {
-                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com chmod +x /home/ubuntu/node-web-app/deployment.sh"
-                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com /home/ubuntu/node-web-app/deployment.sh"
-                }
-            }
-        }
+        
     // End Continuous Deployment Pipeline
     }
 }
