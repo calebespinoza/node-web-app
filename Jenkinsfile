@@ -197,7 +197,7 @@ pipeline {
         stage ('Copy files to Prod Server') {
             steps {
                 sshagent(['prod-key']) {
-                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
+                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com mkdir -p node-web-app"
                     sh "scp .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
                 }
                 //sh "echo '$PROD_PRIVATE_KEY_PSW'"
