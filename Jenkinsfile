@@ -187,6 +187,10 @@ pipeline {
             //when { branch 'main' }
             environment {
                 PROD_SERVER = "ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com"
+                FOLDER_NAME = "node-web-app"
+                SCRIPT = "deployment.sh"
+                COMPOSE_FILE = "prod.docker-compose.yaml"
+                ENV_FILE = ".env"
             }
             stages {
                 stage ('Create .env file') {
@@ -194,9 +198,8 @@ pipeline {
                     environment{ TAG = "latest" }
                     steps {
                         sh """
-                        echo 'FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > .env
-                        echo 'TAG=$TAG' >> .env
-                        echo 'SERVICE_NAME=$IMAGE_NAME' >> .env
+                        echo 'FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > $ENV_FILE
+                        echo 'TAG=$TAG' >> $ENV_FILE
                         """
                     }
                 }
@@ -205,9 +208,9 @@ pipeline {
                     //when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com mkdir -p node-web-app"
-                            sh "scp .env deployment.sh prod.docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
-                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a /home/ubuntu/node-web-app"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $FOLDER_NAME"
+                            sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:/home/ubuntu/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a /home/ubuntu/$FOLDER_NAME"
                         }
                     }
                 }
@@ -216,8 +219,8 @@ pipeline {
                     //when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com chmod +x /home/ubuntu/node-web-app/deployment.sh"
-                            sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com /home/ubuntu/node-web-app/deployment.sh"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x /home/ubuntu/$FOLDER_NAME/$SCRIPT"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER /home/ubuntu/$FOLDER_NAME/$SCRIPT"
                         }
                     }
                 }

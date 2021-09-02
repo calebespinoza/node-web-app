@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#source $HOME/node-web-app/.env
 cd $HOME/node-web-app
 
 echo "Retrieving the Container ID if exits"
@@ -19,7 +18,6 @@ then
         imageID=$(docker inspect --format='{{.Id}}' $imageName)
         if [ $imageID ];
         then
-            #cd $HOME/node-web-app
             docker-compose -f prod.docker-compose.yaml stop
             docker-compose -f prod.docker-compose.yaml rm -f
             docker-compose -f prod.docker-compose.yaml pull
