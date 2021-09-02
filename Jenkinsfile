@@ -171,6 +171,7 @@ pipeline {
                         sh """
                         echo "Removing Image built for Docker Hub"
                         docker rmi -f $FULL_IMAGE_NAME:$IMAGE_TAG_PROD
+                        docker rmi -f $FULL_IMAGE_NAME:latest
                         echo 'Logout Docker Hub'
                         docker logout
                         """
