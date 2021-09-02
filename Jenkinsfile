@@ -15,6 +15,7 @@ pipeline {
         FULL_IMAGE_NAME = "$DOCKER_HUB_REPO/$IMAGE_NAME"
         PROJECT_NAME = "node-web-app"
         PRIVATE_IMAGE_NAME = "$NEXUS_SERVER_URL/$IMAGE_NAME"
+        PROD_PRIVATE_KEY = credentials("prod-key")
     }
 
     stages {
@@ -180,5 +181,25 @@ pipeline {
             }
         }
     // End Continuous Delivery Pipeline
+
+    // Continuos Deployment Pipeline
+        stage ('Create .env file') {
+            when { branch 'main' }
+            environment{ TAG = "latest" }
+            steps {
+                sh """
+                echo '$FULL_IMAGE_NAME' > .env
+                echo '$TAG' >> .env
+                """
+            }
+        }
+
+        stage ('Copy files to Prod Server') {
+            steps {
+                sh "scp -i $PROD_PRIVATE_KEY_PSW .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
+                sh "ssh -i $PROD_PRIVATE_KEY_PSW -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
+            }
+        }
+    // End Continuous Deployment Pipeline
     }
 }
