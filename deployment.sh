@@ -18,6 +18,7 @@ then
         imageID=$(docker inspect --format='{{.Id}}' $imageName)
         if [ $imageID ];
         then
+            cd $HOME/node-web-app
             docker-compose stop nodeapp
             docker-compose rm -f
             #docker rm -f $container1 $container2
