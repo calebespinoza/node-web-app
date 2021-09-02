@@ -21,4 +21,4 @@ then
     fi
 fi
 source $HOME/node-web-app/.env
-docker-compose -f $HOME/node-web-app/prod.docker-compose.yaml up -d --scale $SERVICE_NAME=2 --force-recreate
+docker-compose -f $HOME/node-web-app/prod.docker-compose.yaml up -d --scale nodeapp=2 --force-recreate
