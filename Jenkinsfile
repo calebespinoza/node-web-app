@@ -150,7 +150,6 @@ pipeline {
         stage('Deliver Image for Production') {
             when { branch 'main' }
             environment{ 
-                //TAG = "$IMAGE_TAG_STG"
                 NEXUS_CREDENTIALS = credentials("nexus")
             }
             steps {
