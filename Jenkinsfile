@@ -188,8 +188,8 @@ pipeline {
             environment{ TAG = "latest" }
             steps {
                 sh """
-                echo '$FULL_IMAGE_NAME' > .env
-                echo '$TAG' >> .env
+                echo 'FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > .env
+                echo 'TAG=$TAG' >> .env
                 """
             }
         }
