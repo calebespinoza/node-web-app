@@ -196,7 +196,7 @@ pipeline {
 
         stage ('Copy files to Prod Server') {
             steps {
-                sh "echo '$PROD_PRIVATE_KEY'"
+                sh "echo '$PROD_PRIVATE_KEY_USR'"
                 //sh "scp -i $PROD_PRIVATE_KEY_PSW .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
                 //sh "ssh -i $PROD_PRIVATE_KEY_PSW -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
             }
