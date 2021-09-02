@@ -180,5 +180,52 @@ pipeline {
             }
         }
     // End Continuous Delivery Pipeline
+
+    // Continuos Deployment Pipeline
+        stage ('Continuous Deployment') {
+            when { branch 'main' }
+            environment {
+                PROD_SERVER = "ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com"
+                FOLDER_NAME = "node-web-app"
+                SCRIPT = "deployment.sh"
+                COMPOSE_FILE = "prod.docker-compose.yaml"
+                ENV_FILE = ".env"
+            }
+            stages {
+                stage ('Create .env file') {
+                    when { branch 'main' }
+                    environment{ TAG = "latest" }
+                    steps {
+                        sh """
+                        echo 'FULL_IMAGE_NAME=$FULL_IMAGE_NAME' > $ENV_FILE
+                        echo 'TAG=$TAG' >> $ENV_FILE
+                        """
+                    }
+                }
+
+                stage ('Copy files to Prod Server') {
+                    when { branch 'main' }
+                    steps {
+                        sshagent(['prod-key']) {
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $FOLDER_NAME"
+                            sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:/home/ubuntu/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a /home/ubuntu/$FOLDER_NAME"
+                        }
+                    }
+                }
+
+                stage ('Deploy in Production') {
+                    when { branch 'main' }
+                    steps {
+                        sshagent(['prod-key']) {
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x /home/ubuntu/$FOLDER_NAME/$SCRIPT"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER /home/ubuntu/$FOLDER_NAME/$SCRIPT"
+                        }
+                    }
+                }
+            }
+        }
+        
+    // End Continuous Deployment Pipeline
     }
 }
