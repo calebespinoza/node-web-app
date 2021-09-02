@@ -5,7 +5,7 @@ container2=$(docker ps --filter status=running --filter name=node-web-app* -q | 
 echo "Container 1 = $container1"
 echo "Container 2 = $container2"
 
-if [ $container1 -a $container2 ];
+if [ ! -z $container1 -a ! -z $container2 ];
 then
     echo "Retrieving the Image Name associated to the container"
     imageName=$(docker inspect --format='{{.Config.Image}}' $container1)
@@ -20,5 +20,5 @@ then
         fi
     fi
 fi
-source .env
-docker-compose -f ./docker-compose.yaml up -d
+source $HOME/node-web-app/.env
+docker-compose -f $HOME/node-web-app/docker-compose.yaml up -d
