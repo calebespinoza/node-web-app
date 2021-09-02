@@ -21,4 +21,4 @@ then
     fi
 fi
 source $HOME/node-web-app/.env
-docker-compose -f $HOME/node-web-app/docker-compose.yaml up -d
+docker-compose -f $HOME/node-web-app/docker-compose.yaml up -d --force-recreate
