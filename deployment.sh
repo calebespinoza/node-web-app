@@ -20,5 +20,5 @@ then
         fi
     fi
 fi
-export $HOME/node-web-app/.env
+source $HOME/node-web-app/.env
 docker-compose -f $HOME/node-web-app/docker-compose.yaml up -d
