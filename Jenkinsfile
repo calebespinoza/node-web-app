@@ -201,9 +201,15 @@ pipeline {
                     sh "scp .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/home/ubuntu/node-web-app"
                     sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a /home/ubuntu/node-web-app"
                 }
-                //sh "echo '$PROD_PRIVATE_KEY_PSW'"
-                //sh "scp -i $PROD_PRIVATE_KEY_PSW .env deployment.sh docker-compose.yaml ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com:/node-web-app"
-                //sh "ssh -i $PROD_PRIVATE_KEY_PSW -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com ls -a"
+            }
+        }
+
+        stage ('Deploy in Production') {
+            steps {
+                sshagent(['prod-key']) {
+                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com chmod +x /home/ubuntu/node-web-app/deployment.sh"
+                    sh "ssh -o 'StrictHostKeyChecking no' ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com /home/ubuntu/node-web-app/deployment.sh"
+                }
             }
         }
     // End Continuous Deployment Pipeline
