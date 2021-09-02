@@ -26,5 +26,5 @@ then
         fi
     fi
 fi
-
+# Deploying
 docker-compose -f prod.docker-compose.yaml up -d --scale nodeapp=2 --force-recreate
