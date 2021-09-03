@@ -185,7 +185,7 @@ pipeline {
         stage ('Continuous Deployment') {
             when { branch 'main' }
             environment {
-                PROD_SERVER = "ubuntu@ec2-3-86-234-67.compute-1.amazonaws.com"
+                PROD_SERVER = "ubuntu@ec2-3-94-210-133.compute-1.amazonaws.com"
                 FOLDER_NAME = "node-web-app"
                 SCRIPT = "deployment.sh"
                 COMPOSE_FILE = "prod.docker-compose.yaml"
@@ -193,7 +193,6 @@ pipeline {
             }
             stages {
                 stage ('Create .env file') {
-                    when { branch 'main' }
                     environment{ TAG = "latest" }
                     steps {
                         sh """
@@ -204,22 +203,20 @@ pipeline {
                 }
 
                 stage ('Copy files to Prod Server') {
-                    when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
                             sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $FOLDER_NAME"
-                            sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:/home/ubuntu/$FOLDER_NAME"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a /home/ubuntu/$FOLDER_NAME"
+                            sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:~/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a $HOME/$FOLDER_NAME"
                         }
                     }
                 }
 
                 stage ('Deploy in Production') {
-                    when { branch 'main' }
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x /home/ubuntu/$FOLDER_NAME/$SCRIPT"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER /home/ubuntu/$FOLDER_NAME/$SCRIPT"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x $HOME/$FOLDER_NAME/$SCRIPT"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER $HOME/$FOLDER_NAME/$SCRIPT '$HOME/$FOLDER_NAME' '$COMPOSE_FILE'"
                         }
                     }
                 }

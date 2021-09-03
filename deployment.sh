@@ -1,6 +1,9 @@
 #!/bin/bash
 
-cd $HOME/node-web-app
+compose_filepath=$1
+compose_filename=$2
+cd $compose_filepath
+#cd $HOME/node-web-app
 
 echo "Retrieving the Container ID if exits"
 container1=$(docker ps --filter status=running --filter name=node-web-app* -q | head -n 1)
@@ -13,18 +16,18 @@ then
     echo "Retrieving the Image Name associated to the container"
     imageName=$(docker inspect --format='{{.Config.Image}}' $container1)
     echo "ImageName = $imageName"
-    if [ $imageName ];
+    if [ ! -z $imageName ];
     then
         imageID=$(docker inspect --format='{{.Id}}' $imageName)
-        if [ $imageID ];
+        if [ ! -z $imageID ];
         then
-            docker-compose -f prod.docker-compose.yaml stop
-            docker-compose -f prod.docker-compose.yaml rm -f
-            docker-compose -f prod.docker-compose.yaml pull
+            docker-compose -f $compose_filename stop
+            docker-compose -f $compose_filename rm -f
+            docker-compose -f $compose_filename pull
             #docker rm -f $container1 $container2
             #docker rmi -f $imageID
         fi
     fi
 fi
 # Deploying
-docker-compose -f prod.docker-compose.yaml up -d --scale nodeapp=2 --force-recreate
+docker-compose -f $compose_filename up -d --scale nodeapp=2 --force-recreate
