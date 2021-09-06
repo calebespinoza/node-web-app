@@ -205,9 +205,9 @@ pipeline {
                 stage ('Copy files to Prod Server') {
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p ~/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $HOME/$FOLDER_NAME"
                             sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:~/$FOLDER_NAME"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a ~/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a $HOME/$FOLDER_NAME"
                         }
                     }
                 }
