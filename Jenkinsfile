@@ -185,7 +185,7 @@ pipeline {
         stage ('Continuous Deployment') {
             when { branch 'main' }
             environment {
-                PROD_SERVER = "ubuntu@ec2-3-94-210-133.compute-1.amazonaws.com"
+                PROD_SERVER = "ubuntu@ec2-18-205-29-252.compute-1.amazonaws.com"
                 FOLDER_NAME = "node-web-app"
                 SCRIPT = "deployment.sh"
                 COMPOSE_FILE = "prod.docker-compose.yaml"
@@ -205,7 +205,7 @@ pipeline {
                 stage ('Copy files to Prod Server') {
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p ~/$FOLDER_NAME"
                             sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:~/$FOLDER_NAME"
                             sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a ~/$FOLDER_NAME"
                         }
@@ -216,7 +216,7 @@ pipeline {
                     steps {
                         sshagent(['prod-key']) {
                             sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x ~/$FOLDER_NAME/$SCRIPT"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ~/$FOLDER_NAME/$SCRIPT '~/$FOLDER_NAME' '$COMPOSE_FILE'"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER $FOLDER_NAME/$SCRIPT '~/$FOLDER_NAME' '$COMPOSE_FILE'"
                         }
                     }
                 }
