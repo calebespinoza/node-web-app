@@ -205,9 +205,9 @@ pipeline {
                 stage ('Copy files to Prod Server') {
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p $HOME/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER mkdir -p /home/ubuntu/$FOLDER_NAME"
                             sh "scp $ENV_FILE $SCRIPT $COMPOSE_FILE $PROD_SERVER:~/$FOLDER_NAME"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a $HOME/$FOLDER_NAME"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER ls -a /home/ubuntu/$FOLDER_NAME"
                         }
                     }
                 }
@@ -215,8 +215,8 @@ pipeline {
                 stage ('Deploy in Production') {
                     steps {
                         sshagent(['prod-key']) {
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x ~/$FOLDER_NAME/$SCRIPT"
-                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER $FOLDER_NAME/$SCRIPT '~/$FOLDER_NAME' '$COMPOSE_FILE'"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER chmod +x /home/ubuntu/$FOLDER_NAME/$SCRIPT"
+                            sh "ssh -o 'StrictHostKeyChecking no' $PROD_SERVER $FOLDER_NAME/$SCRIPT '/home/ubuntu/$FOLDER_NAME' '$COMPOSE_FILE'"
                         }
                     }
                 }
